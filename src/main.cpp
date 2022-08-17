@@ -1,3 +1,13 @@
+/**
+ * @file main.cpp
+ * @author Brendon Bernardino (brendonrsb@hotmail.com)
+ * @brief 
+ * @version 0.1
+ * @date 2022-08-01
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include <Arduino.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,22 +17,86 @@
 #include "display.h"
 #include <Wire.h>
 
-U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, PIN_SCL, PIN_SDA, U8X8_PIN_NONE); 
+U8G2_SSD1306_128X64_NONAME_F_SW_I2C u8g2(U8G2_R0, PIN_SCL, PIN_SDA, U8X8_PIN_NONE);
+BH1750 gy30(0x23);
 
 float delayTime = 0;
 
 void setup() {
-  u8g2.begin();
+  pinMode(tempPin, INPUT);
   
+  u8g2.begin();
+  Wire.begin();
+  gy30.begin(BH1750::CONTINUOUS_HIGH_RES_MODE);
+  
+  Wire.beginTransmission(0x3C);
   u8g2.clearBuffer();
   u8g2.setFont(u8g2_font_timR14_tf);
   u8g2.drawStr(15,25,"Inicializando");
   u8g2.drawStr(25,45,"sensores...");
   u8g2.sendBuffer();
+  Wire.endTransmission();
 }
 
 void loop() {
+  float lux = gy30.readLightLevel();
+  float leitura_temp = analogRead(tempPin);
+  float temp = (leitura_temp/1023.0)*500.0;
+  float leitura_chuva = (analogRead(chuvaPin))/4;
+  float leitura_umid = analogRead(umidadePin);
 
+  //Convertendo chuva em porcentagem
+  int percent_rain = 100 - ((leitura_chuva*100.0)/1023.0);
+  printf("leitura_chuva: %f\n", leitura_chuva);
+
+  if (leitura_chuva >900){
+    printf("\n--SEM CHUVA--\n");
+  }
+  else if (leitura_chuva >600 && leitura_chuva <900){
+    printf("\n--NEBLINA--\n");
+  }
+  else if (leitura_chuva >400 && leitura_chuva <600){
+    printf("\n--CHOVENDO--\n");
+  }
+  else if (leitura_chuva <400){
+    printf("\n--CHUVA FORTE--\n");
+  }    
+
+  printf("Luminosidade: %f lumens\n", lux);
+  Wire.beginTransmission(0x3C);
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_timR14_tf);
+  u8g2.drawStr(12,25,"Luminosidade");
+  u8g2.setCursor(25,45);
+  u8g2.print(lux);
+  // u8g2.drawStr(25,45,"sensores...");
+  u8g2.sendBuffer();
+  Wire.endTransmission();
+  delay(500);
+
+  printf("Temperatura: %f ºC\n", temp);
+  Wire.beginTransmission(0x3C);
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_timR14_tf);
+  u8g2.drawStr(12,25,"Temperatura");
+  u8g2.setCursor(25,45);
+  u8g2.print(temp);
+  // u8g2.drawStr(25,45,"sensores...");
+  u8g2.sendBuffer();
+  Wire.endTransmission();
+  delay(500);
+
+  printf("Chuva: %d %\n", percent_rain);
+  Wire.beginTransmission(0x3C);
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_timR14_tf);
+  u8g2.drawStr(12,25,"Chuva");
+  u8g2.setCursor(25,45);
+  u8g2.print(percent_rain);
+  // u8g2.drawStr(25,45,"sensores...");
+  u8g2.sendBuffer();
+  Wire.endTransmission();
+  delay(500);
 }
 
 // void enviaValores() {
@@ -75,7 +149,6 @@ void loop() {
 
 //   Wire.begin();  
 //   GY30.begin();
-//   dht.begin();
 
 //   conectaWiFi();
 //   MQTT.setServer(BROKERMQTT, BROKERPORT); 
