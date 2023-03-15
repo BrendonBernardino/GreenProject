@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "GreenProject",
+			"path": ".."
+		},
+		{
+			"name": "Esp_Automation01",
+			"path": "../../Esp_Automation01"
+		}
+	],
+	"settings": {}
+}

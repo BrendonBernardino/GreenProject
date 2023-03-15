@@ -19,6 +19,7 @@
 float delayTime = 0;
 
 void setup() {
+  Serial.begin(115200);
   pinMode(tempPin, INPUT);
   init_sensors();
   

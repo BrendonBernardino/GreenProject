@@ -10,7 +10,7 @@
 #define PIN_SCL 22
 #define PIN_SDA 21
 
-#define DHTPIN 35
+#define DHTPIN 32
 #define DHTTYPE DHT11   // DHT 11
 
 #define pinLedRed   2

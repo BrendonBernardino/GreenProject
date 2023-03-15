@@ -1,5 +1,6 @@
 #include "sensors.h"
 #include "display.h"
+#include <esp_task_wdt.h>
 
 BH1750 gy30(0x23);
 DHT dht(DHTPIN, DHTTYPE);
@@ -26,6 +27,8 @@ static /*ponteiro de vetor de float*/void get_sensors() {
 }
 
 void action_sensors(void) {
+    // init_Oled();
+    // Wire.begin();
     get_sensors();
 
     //Convertendo chuva em porcentagem
@@ -35,6 +38,8 @@ void action_sensors(void) {
     int percent_soilmoisture = map(leitura_umid, 0, 2950, 100, 0);
     printf("leitura_umid: %f\n", leitura_umid);
 
+    esp_task_wdt_reset();
+
     show_display_temp(0x3C);
     delay(500);
     show_display_lumi(0x3C);
@@ -43,10 +48,17 @@ void action_sensors(void) {
     delay(500);
     show_display_rain(0x3C, percent_rain);
     delay(500);
+    esp_task_wdt_reset();
 
     String temp = String(leitura_temp,2);
     String lumi = String(lux,2);
     String humiditySoil = String(percent_soilmoisture);
 
     publish_sensors_mqtt(temp, lumi, humiditySoil, rain_str);
+
+    esp_task_wdt_reset();
+
+    // turnoff_Oled();
+    // Wire.end();
+    // delay(5000);
 }

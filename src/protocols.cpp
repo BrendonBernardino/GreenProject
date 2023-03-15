@@ -1,16 +1,19 @@
 #include "protocols.h"
+#include <esp_task_wdt.h>
 
 //WiFi
-const char* SSID = "GVTX-9999";
+const char* SSID = "TROIA-0000";
 const char* PASSWORD = "bwh4ck34d0";
 WiFiClient wifiClient;
 PubSubClient MQTT(wifiClient);                       
  
 //MQTT Server
-const char* BROKERMQTT = "mqtt.eclipseprojects.io";
+const char* BROKERMQTT = "test.mosquitto.org";//"mqtt.eclipseprojects.io";
 int BROKERPORT = 1883;
 
 void setup_protocols(void) {
+    esp_task_wdt_init(10, true); //enable panic so ESP32 restarts
+    esp_task_wdt_add(NULL);
     conectaWiFi();
     MQTT.setServer(BROKERMQTT, BROKERPORT);
 }
@@ -41,12 +44,16 @@ void conectaWiFi(void) {
   Serial.print("Conectando-se na rede: ");
   Serial.print(SSID);
   Serial.println("  Aguarde!");
+  
+  esp_task_wdt_reset();
 
   WiFi.begin(SSID, PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
     Serial.print(".");
   }
+
+  esp_task_wdt_reset();
   
   Serial.println();
   Serial.print("Conectado com sucesso, na rede: ");

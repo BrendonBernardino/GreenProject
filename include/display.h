@@ -2,6 +2,7 @@
 #include "sensors.h"
 
 void init_Oled(void);
+void turnoff_Oled(void);
 void action_Oled(void);
 void display_welcome(int _address_oled);
 void show_display_temp(int _address_oled);

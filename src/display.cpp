@@ -6,6 +6,10 @@ void init_Oled(void) {
     u8g2.begin();
 }
 
+void turnoff_Oled(void) {
+    u8g2.setPowerSave(1);
+}
+
 void display_welcome(int _address_oled) {
     Wire.beginTransmission(_address_oled);
     u8g2.clearBuffer();
@@ -63,12 +67,12 @@ void show_display_rain(int _address_oled, int _percent) {
     u8g2.drawStr(12,25,"Chuva");
     // u8g2.setCursor(25,45);
     // u8g2.print(_percent);
-    if (leitura_chuva >900){
+    if (leitura_chuva >750){
         rain_str = "Sem Chuva";
         printf("\n--SEM CHUVA--\n");
         u8g2.drawStr(15,45,"Sem Chuva");
     }
-    else if (leitura_chuva >600 && leitura_chuva <900){
+    else if (leitura_chuva >600 && leitura_chuva <750){
         rain_str = "Neblina";
         printf("\n--NEBLINA--\n");
         u8g2.drawStr(15,45,"Neblina");
@@ -78,7 +82,7 @@ void show_display_rain(int _address_oled, int _percent) {
         printf("\n--CHOVENDO--\n");
         u8g2.drawStr(15,45,"Chovendo");
     }
-    else if (leitura_chuva <400){
+    else if (leitura_chuva <=400){
         rain_str = "Chuva Forte";
         printf("\n--CHUVA FORTE--\n");
         u8g2.drawStr(15,45,"Temporal");
